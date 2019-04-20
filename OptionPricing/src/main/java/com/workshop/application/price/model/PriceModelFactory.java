@@ -4,12 +4,14 @@ import com.workshop.application.datamodel.OptionType;
 
 public final class PriceModelFactory {
 
-	
-	public static OptionPriceCalc getModel(String name, OptionType optionType) {
-		switch(name) {
-		default:
-			return new MaygardOptionPriceCalc(optionType);
-		}
-	}
-	
+
+    public static OptionPriceCalc getModel(String name, OptionType optionType) {
+        switch (name) {
+            case "jquant":
+                return new JQuantOptionPriceCalc(optionType);
+            default:
+                return new MaygardOptionPriceCalc(optionType);
+        }
+    }
+
 }

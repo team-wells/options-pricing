@@ -32,7 +32,6 @@ import com.workshop.application.price.model.PriceModelFactory;
 public class CMTWorkshopController {
 
 	private final ExecutorService executor = Executors.newFixedThreadPool(10);
-	DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("ddMMyyyy");
 	CompletionService<PriceResponse> cs = new ExecutorCompletionService<>(executor);
 	
 	@CrossOrigin
@@ -71,7 +70,7 @@ public class CMTWorkshopController {
 				OptionPriceCalc calc = PriceModelFactory.getModel(model, request.getOptionType());
 				PriceResponse response = new PriceResponse(calc.getOptionPrice(spotPrice,
 						request.getStrikePrice(), request.getImpliedVolatility()/100, 
-						ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(request.getExpireDate(),formatter)),
+						request.getExpireDate(),
 						interestRate/100),
 						request.getOptionType(), request.getStrikePrice(), request.getExpireDate());
 				response.setRho(calc.getRho());

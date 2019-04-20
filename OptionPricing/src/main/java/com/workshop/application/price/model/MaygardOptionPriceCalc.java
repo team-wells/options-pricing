@@ -2,7 +2,13 @@ package com.workshop.application.price.model;
 
 import com.workshop.application.datamodel.OptionType;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 public class MaygardOptionPriceCalc  implements OptionPriceCalc{
+
+    private final DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("ddMMyyyy");
 	
 	private BackScholesMaygard bs = new BackScholesMaygard();
 	private final OptionType type;
@@ -12,7 +18,8 @@ public class MaygardOptionPriceCalc  implements OptionPriceCalc{
 	}
 	
 	@Override
-	public double getOptionPrice(double spot, double strike, double iv, double time, double ir) {
+	public double getOptionPrice(double spot, double strike, double iv, String maturityStr, double ir) {
+	    double time = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(maturityStr,formatter));
 		bs.bscholEprice(spot, strike, iv, time, ir);
 		return type == OptionType.CALL ? bs.getCalle() : bs.getPute();
 	}
