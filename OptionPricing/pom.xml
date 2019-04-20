@@ -5,30 +5,30 @@
 	<artifactId>OptionPricing</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<build>
-	  <plugins>
-	    <plugin>
-	      <groupId>org.springframework.boot</groupId>
-	      <artifactId>spring-boot-maven-plugin</artifactId>
-	      <configuration>
-        	<includeSystemScope>true</includeSystemScope>
-    	  </configuration>
-	    </plugin>
-	    <plugin>
-	      <!-- Build an executable JAR -->
-	      <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-jar-plugin</artifactId>
-	      <version>3.1.0</version>
-	      <configuration>
-	        <archive>
-	          <manifest>
-	            <addClasspath>true</addClasspath>
-	            <classpathPrefix>lib/</classpathPrefix>
-	            <mainClass>com.workshop.application.CMTWorkshopApplication</mainClass>
-	          </manifest>
-	        </archive>
-	      </configuration>
-	    </plugin>
-	  </plugins>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- Build an executable JAR -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>com.workshop.application.CMTWorkshopApplication</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 	<parent>
@@ -49,6 +49,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.maygard</groupId>
+			<artifactId>maygard-beta</artifactId>
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
 </project>
