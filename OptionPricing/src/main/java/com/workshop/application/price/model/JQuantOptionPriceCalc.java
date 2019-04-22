@@ -4,11 +4,10 @@ import com.workshop.application.datamodel.OptionType;
 import org.jquantlib.daycounters.Actual365Fixed;
 import org.jquantlib.daycounters.DayCounter;
 import org.jquantlib.exercise.AmericanExercise;
+import org.jquantlib.exercise.EuropeanExercise;
 import org.jquantlib.exercise.Exercise;
-import org.jquantlib.instruments.Option;
-import org.jquantlib.instruments.Payoff;
-import org.jquantlib.instruments.PlainVanillaPayoff;
-import org.jquantlib.instruments.VanillaOption;
+import org.jquantlib.instruments.*;
+import org.jquantlib.pricingengines.AnalyticEuropeanEngine;
 import org.jquantlib.pricingengines.vanilla.BaroneAdesiWhaleyApproximationEngine;
 import org.jquantlib.processes.BlackScholesMertonProcess;
 import org.jquantlib.quotes.Handle;
@@ -27,7 +26,9 @@ import org.jquantlib.time.calendars.Target;
 public class JQuantOptionPriceCalc implements OptionPriceCalc {
 
     private VanillaOption americanOption;
+    private VanillaOption europeanOption;
     private final Option.Type type;
+    private boolean isEuropean = true;
 
     public JQuantOptionPriceCalc(OptionType type) {
         switch (type) {
@@ -50,8 +51,8 @@ public class JQuantOptionPriceCalc implements OptionPriceCalc {
         final Calendar calendar = new Target();
 
         final Date settlementDate = Date.todaysDate();
-        int dd = Integer.parseInt(maturityStr.substring(0,2));
-        int mm = Integer.parseInt(maturityStr.substring(2,4));
+        int dd = Integer.parseInt(maturityStr.substring(0, 2));
+        int mm = Integer.parseInt(maturityStr.substring(2, 4));
         int yyyy = Integer.parseInt(maturityStr.substring(4));
         final Date maturity = new Date(dd, mm, yyyy);
 
@@ -65,6 +66,10 @@ public class JQuantOptionPriceCalc implements OptionPriceCalc {
 
         // Define exercise for American Options
         final Exercise americanExercise = new AmericanExercise(settlementDate, maturity);
+
+        // Define exercise for European Options
+        final Exercise europeanExercise = new EuropeanExercise(maturity);
+
         // bootstrap the yield/dividend/volatility curves
         final Handle<Quote> underlyingH = new Handle<Quote>(new SimpleQuote(underlying));
         final Handle<YieldTermStructure> flatDividendTS = new Handle<YieldTermStructure>(new FlatForward(settlementDate, dividendYield, dayCounter));
@@ -78,31 +83,38 @@ public class JQuantOptionPriceCalc implements OptionPriceCalc {
         String method = "Barone-Adesi/Whaley";
         americanOption.setPricingEngine(new BaroneAdesiWhaleyApproximationEngine(bsmProcess));
         //System.out.printf(fmt, method, Double.NaN, Double.NaN, americanOption.NPV() );
-        return americanOption.NPV();
+
+        // European Options
+        europeanOption = new EuropeanOption(payoff, europeanExercise);
+        // Black-Scholes for European
+        String method1 = "Black-Scholes";
+        europeanOption.setPricingEngine(new AnalyticEuropeanEngine(bsmProcess));
+        //System.out.printf(fmt, method1, europeanOption.NPV(), Double.NaN, Double.NaN );
+        return isEuropean ? europeanOption.NPV() : americanOption.NPV();
     }
 
     @Override
     public double getDelta() {
-        return americanOption.delta();
+        return isEuropean ? europeanOption.delta() : americanOption.delta();
     }
 
     @Override
     public double getGamma() {
-        return americanOption.gamma();
+        return isEuropean ? europeanOption.gamma() : americanOption.gamma();
     }
 
     @Override
     public double getTheta() {
-        return americanOption.theta();
+        return isEuropean ? europeanOption.theta() : americanOption.theta();
     }
 
     @Override
     public double getRho() {
-        return americanOption.rho();
+        return isEuropean ? europeanOption.rho() : americanOption.rho();
     }
 
     @Override
     public double getVega() {
-        return americanOption.vega();
+        return isEuropean ? europeanOption.vega() :americanOption.vega();
     }
 }
