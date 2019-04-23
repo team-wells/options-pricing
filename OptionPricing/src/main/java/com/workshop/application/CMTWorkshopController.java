@@ -1,6 +1,5 @@
 package com.workshop.application;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -28,7 +27,7 @@ public class CMTWorkshopController {
 
 	private final ExecutorService executor = Executors.newFixedThreadPool(10);
 	private CompletionService<PriceResponse> cs = new ExecutorCompletionService<>(executor);
-	private DecimalFormat df = new DecimalFormat("0.0000");
+
 	@CrossOrigin
 	@GetMapping("/")
 	public String index() {
