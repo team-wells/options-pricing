@@ -1,19 +1,16 @@
 package com.workshop.application;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.IntStream;
 
+import org.apache.commons.math3.util.Precision;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workshop.application.datamodel.ComputePriceRequest;
 import com.workshop.application.datamodel.OptionPriceRequest;
-import com.workshop.application.datamodel.OptionType;
 import com.workshop.application.datamodel.PriceResponse;
-import com.workshop.application.price.model.MaygardOptionPriceCalc;
 import com.workshop.application.price.model.OptionPriceCalc;
 import com.workshop.application.price.model.PriceModelFactory;
 
@@ -32,8 +27,8 @@ import com.workshop.application.price.model.PriceModelFactory;
 public class CMTWorkshopController {
 
 	private final ExecutorService executor = Executors.newFixedThreadPool(10);
-	CompletionService<PriceResponse> cs = new ExecutorCompletionService<>(executor);
-	
+	private CompletionService<PriceResponse> cs = new ExecutorCompletionService<>(executor);
+	private DecimalFormat df = new DecimalFormat("0.0000");
 	@CrossOrigin
 	@GetMapping("/")
 	public String index() {
@@ -73,11 +68,11 @@ public class CMTWorkshopController {
 						request.getExpireDate(),
 						interestRate/100),
 						request.getOptionType(), request.getStrikePrice(), request.getExpireDate());
-				response.setRho(calc.getRho());
-				response.setDelta(calc.getDelta());
-				response.setGamma(calc.getGamma());
-				response.setTheta(calc.getTheta());
-				response.setVega(calc.getVega());
+				response.setRho(Precision.round(calc.getRho(),4));
+				response.setDelta(Precision.round(calc.getDelta(),4));
+				response.setGamma(Precision.round(calc.getGamma(),4));
+				response.setTheta(Precision.round(calc.getTheta(),4));
+				response.setVega(Precision.round(calc.getVega(),4));
 				return response;
 			}
 		};
