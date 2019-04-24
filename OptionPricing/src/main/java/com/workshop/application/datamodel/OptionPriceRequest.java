@@ -4,13 +4,13 @@ public class OptionPriceRequest {
 	private double strikePrice;
 	private double impliedVolatility;
 	private String expireDate;
-	private OptionType optionType;
+	private String optionType;
 
 	public OptionType getOptionType() {
-		return optionType;
+		return optionType != null && !optionType.isEmpty() ? OptionType.valueOf(optionType) : null;
 	}
 
-	public void setOptionType(OptionType optionType) {
+	public void setOptionType(String optionType) {
 		this.optionType = optionType;
 	}
 

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workshop.application.datamodel.ComputePriceRequest;
 import com.workshop.application.datamodel.OptionPriceRequest;
+import com.workshop.application.datamodel.OptionType;
+import com.workshop.application.datamodel.PriceComparisonResponse;
 import com.workshop.application.datamodel.PriceResponse;
 import com.workshop.application.price.model.OptionPriceCalc;
 import com.workshop.application.price.model.PriceModelFactory;
@@ -55,6 +57,32 @@ public class CMTWorkshopController {
 		});
 		return responses;
 	}
+	
+	@CrossOrigin
+	@PostMapping("/cmt/workspace/compare")
+	public List<PriceComparisonResponse> compareModels(@RequestBody ComputePriceRequest request) {
+		List<PriceComparisonResponse> responses = new ArrayList<>();
+		Future<PriceResponse> maygaurd;
+		Future<PriceResponse> jquant;
+			
+		for (OptionType type : OptionType.values()) {
+			for (OptionPriceRequest r : request.getRequests()) {
+				r.setOptionType(type.name());
+				maygaurd = cs.submit(getJob(r, "mayguard", request.getSpotPrice(), request.getInterestRate()));
+				jquant = cs.submit(getJob(r, "jquant", request.getSpotPrice(), request.getInterestRate()));
+				PriceComparisonResponse res = new PriceComparisonResponse(r.getStrikePrice(), r.getExpireDate(), type);
+				try {
+					res.setPriceMG(maygaurd.get() != null ? maygaurd.get().getPrice():0.0d);
+					res.setPriceJquant(jquant.get()!= null ? jquant.get().getPrice():0.0d);
+					responses.add(res);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return responses;
+	}
+	
 	
 	private Callable<PriceResponse> getJob(OptionPriceRequest request, String model, double spotPrice, double interestRate){
 		return new Callable<PriceResponse>() {
