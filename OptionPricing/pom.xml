@@ -51,9 +51,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-math3</artifactId>
+		    <version>3.6.1</version>
+		</dependency>		
+		<dependency>
 			<groupId>com.maygard</groupId>
 			<artifactId>maygard-beta</artifactId>
 			<version>0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jquantlib</groupId>
+			<artifactId>jquantlib</artifactId>
+			<version>0.3.0</version>
+		</dependency>			
+
+		
 	</dependencies>
 </project>
