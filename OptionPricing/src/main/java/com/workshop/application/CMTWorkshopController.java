@@ -65,9 +65,11 @@ public class CMTWorkshopController {
 		Future<PriceResponse> maygaurd;
 		Future<PriceResponse> jquant;
 			
-		for (OptionType type : OptionType.values()) {
+		//for (OptionType type : OptionType.values()) {
 			for (OptionPriceRequest r : request.getRequests()) {
-				r.setOptionType(type.name());
+				//r.setOptionType(type.name());
+				OptionType type = r.getOptionType();
+
 				maygaurd = cs.submit(getJob(r, "mayguard", request.getSpotPrice(), request.getInterestRate()));
 				jquant = cs.submit(getJob(r, "jquant", request.getSpotPrice(), request.getInterestRate()));
 				PriceComparisonResponse res = new PriceComparisonResponse(r.getStrikePrice(), r.getExpireDate(), type);
@@ -79,7 +81,7 @@ public class CMTWorkshopController {
 					e.printStackTrace();
 				}
 			}
-		}
+		//}
 		return responses;
 	}
 	
