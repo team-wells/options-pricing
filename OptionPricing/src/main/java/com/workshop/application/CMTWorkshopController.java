@@ -74,8 +74,8 @@ public class CMTWorkshopController {
 				jquant = cs.submit(getJob(r, "jquant", request.getSpotPrice(), request.getInterestRate()));
 				PriceComparisonResponse res = new PriceComparisonResponse(r.getStrikePrice(), r.getExpireDate(), type);
 				try {
-					res.setPriceMG(maygaurd.get() != null ? maygaurd.get().getPrice():0.0d);
-					res.setPriceJquant(jquant.get()!= null ? jquant.get().getPrice():0.0d);
+					res.setPriceMG(maygaurd.get() != null ? Precision.round(maygaurd.get().getPrice(),4):0.0d);
+					res.setPriceJquant(jquant.get()!= null ? Precision.round(jquant.get().getPrice(),4):0.0d);
 					responses.add(res);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -92,10 +92,10 @@ public class CMTWorkshopController {
 			@Override
 			public PriceResponse call() throws Exception {
 				OptionPriceCalc calc = PriceModelFactory.getModel(model, request.getOptionType());
-				PriceResponse response = new PriceResponse(calc.getOptionPrice(spotPrice,
+				PriceResponse response = new PriceResponse(Precision.round(calc.getOptionPrice(spotPrice,
 						request.getStrikePrice(), request.getImpliedVolatility()/100, 
 						request.getExpireDate(),
-						interestRate/100),
+						interestRate/100),4),
 						request.getOptionType(), request.getStrikePrice(), request.getExpireDate());
 				response.setRho(Precision.round(calc.getRho(),4));
 				response.setDelta(Precision.round(calc.getDelta(),4));
