@@ -35,73 +35,70 @@ public class CMTWorkshopController {
 	public String index() {
 		return "Welcome to Option Pricing calculator services";
 	}
-	
+
 	@CrossOrigin
 	@PostMapping("/cmt/workspace/calculate")
 	public List<PriceResponse> calculatePrice(@RequestBody ComputePriceRequest request) {
+		System.out.println("Received request to compute");
 		List<PriceResponse> responses = new ArrayList<>();
 		List<Future<PriceResponse>> futures = new ArrayList<>();
 		request.getRequests().forEach(R -> {
 			futures.add(cs.submit(getJob(R, request.getModel(), request.getSpotPrice(), request.getInterestRate())));
 		});
-		futures.forEach( F ->{
+		futures.forEach(F -> {
 			PriceResponse r;
 			try {
 				r = F.get();
-				if(r != null)
+				if (r != null)
 					responses.add(r);
-			}catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 		});
 		return responses;
 	}
-	
+
 	@CrossOrigin
 	@PostMapping("/cmt/workspace/compare")
 	public List<PriceComparisonResponse> compareModels(@RequestBody ComputePriceRequest request) {
+		System.out.println("Received request to compare");
 		List<PriceComparisonResponse> responses = new ArrayList<>();
 		Future<PriceResponse> maygaurd;
 		Future<PriceResponse> jquant;
-			
-		//for (OptionType type : OptionType.values()) {
-			for (OptionPriceRequest r : request.getRequests()) {
-				//r.setOptionType(type.name());
-				OptionType type = r.getOptionType();
 
-				maygaurd = cs.submit(getJob(r, "mayguard", request.getSpotPrice(), request.getInterestRate()));
-				jquant = cs.submit(getJob(r, "jquant", request.getSpotPrice(), request.getInterestRate()));
-				PriceComparisonResponse res = new PriceComparisonResponse(r.getStrikePrice(), r.getExpireDate(), type);
-				try {
-					res.setPriceMG(maygaurd.get() != null ? Precision.round(maygaurd.get().getPrice(),4):0.0d);
-					res.setPriceJquant(jquant.get()!= null ? Precision.round(jquant.get().getPrice(),4):0.0d);
-					responses.add(res);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		for (OptionPriceRequest r : request.getRequests()) {
+			OptionType type = r.getOptionType();
+			maygaurd = cs.submit(getJob(r, "mayguard", request.getSpotPrice(), request.getInterestRate()));
+			jquant = cs.submit(getJob(r, "jquant", request.getSpotPrice(), request.getInterestRate()));
+			PriceComparisonResponse res = new PriceComparisonResponse(r.getStrikePrice(), r.getExpireDate(), type);
+			try {
+				res.setPriceMG(maygaurd.get() != null ? Precision.round(maygaurd.get().getPrice(), 4) : 0.0d);
+				res.setPriceJquant(jquant.get() != null ? Precision.round(jquant.get().getPrice(), 4) : 0.0d);
+				responses.add(res);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		//}
+		}
 		return responses;
 	}
-	
-	
-	private Callable<PriceResponse> getJob(OptionPriceRequest request, String model, double spotPrice, double interestRate){
+
+	private Callable<PriceResponse> getJob(OptionPriceRequest request, String model, double spotPrice,
+			double interestRate) {
 		return new Callable<PriceResponse>() {
-			
+
 			@Override
 			public PriceResponse call() throws Exception {
 				OptionPriceCalc calc = PriceModelFactory.getModel(model, request.getOptionType());
-				PriceResponse response = new PriceResponse(Precision.round(calc.getOptionPrice(spotPrice,
-						request.getStrikePrice(), request.getImpliedVolatility()/100, 
-						request.getExpireDate(),
-						interestRate/100),4),
+				PriceResponse response = new PriceResponse(
+						Precision.round(calc.getOptionPrice(spotPrice, request.getStrikePrice(),
+								request.getImpliedVolatility() / 100, request.getExpireDate(), interestRate / 100), 4),
 						request.getOptionType(), request.getStrikePrice(), request.getExpireDate());
-				response.setRho(Precision.round(calc.getRho(),4));
-				response.setDelta(Precision.round(calc.getDelta(),4));
-				response.setGamma(Precision.round(calc.getGamma(),4));
-				response.setTheta(Precision.round(calc.getTheta(),4));
-				response.setVega(Precision.round(calc.getVega(),4));
+				response.setRho(Precision.round(calc.getRho(), 4));
+				response.setDelta(Precision.round(calc.getDelta(), 4));
+				response.setGamma(Precision.round(calc.getGamma(), 4));
+				response.setTheta(Precision.round(calc.getTheta(), 4));
+				response.setVega(Precision.round(calc.getVega(), 4));
 				return response;
 			}
 		};

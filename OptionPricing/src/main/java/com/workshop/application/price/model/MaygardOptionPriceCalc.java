@@ -19,7 +19,7 @@ public class MaygardOptionPriceCalc  implements OptionPriceCalc{
 	
 	@Override
 	public double getOptionPrice(double spot, double strike, double iv, String maturityStr, double ir) {
-	    double time = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(maturityStr,formatter));
+	    double time = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(maturityStr,formatter))+1;
 		bs.bscholEprice(spot, strike, iv, time, ir);
 		return type == OptionType.CALL ? bs.getCalle() : bs.getPute();
 	}
