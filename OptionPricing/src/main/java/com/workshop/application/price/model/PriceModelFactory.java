@@ -1,8 +1,5 @@
 package com.workshop.application.price.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.workshop.application.datamodel.OptionType;
 
 public final class PriceModelFactory {
